@@ -13,8 +13,9 @@ import schedule = require('node-schedule');
 import { ApiRoutes } from './routes';
 import { logger } from './services';
 
-import { Request } from 'mssql';
 import { Cache } from './cache';
+import { Configuration } from './models/Configuration';
+import { Params } from './models/Params';
 import { Database } from './services/database';
 import { ConfigurationFactory } from './services/factory/configuration';
 
@@ -53,21 +54,22 @@ export class Server {
 			if (err) {
 				logger.info('Erro ao conectar o banco!');
 			}
-			const request: Request = db.request;
-			request.query('select * from Params').then((params: any) => {
-				const result: any[] = params.recordset;
-				for (const record of result) {
-					Cache.set(record.key, record.value);
-				}
 
-				self.schedule();
+			db.repository(Params)
+				.find()
+				.then(async (result) => {
+					for (const record of result) {
+						Cache.set(record.key, record.value);
+					}
 
-				// configure application
-				self.config();
+					self.schedule();
 
-				// add routes
-				self.routes();
-			});
+					// configure application
+					self.config();
+
+					// add routes
+					self.routes();
+				});
 		});
 	}
 
@@ -80,14 +82,28 @@ export class Server {
 	public schedule () {
 		const execute: schedule.JobCallback = () => {
 			logger.info('execute job: %s', new Date());
-			const request: Request = db.request;
-			request.query('select * from Configuration order by priority').then((configutarion: any) => {
-				const result: any[] = configutarion.recordset;
-				for (const record of result) {
-					ConfigurationFactory.addRow(record);
-				}
-				ConfigurationFactory.import();
-			});
+
+			db.repository(Configuration)
+				.find()
+				.then(async (configutarion) => {
+					console.log(configutarion);
+					for (const record of configutarion) {
+						console.log(record);
+						ConfigurationFactory.addRow(record);
+					}
+					ConfigurationFactory.import();
+				});
+
+			/*			const request: Request = db.request;
+			request
+				.query('select * from Configuration order by priority')
+				.then((configutarion: any) => {
+					const result: any[] = configutarion.recordset;
+					for (const record of result) {
+						ConfigurationFactory.addRow(record);
+					}
+					ConfigurationFactory.import();
+				});*/
 		};
 		schedule.scheduleJob('*/1 * * * *', execute);
 	}
@@ -129,10 +145,17 @@ export class Server {
 		this.app.use(methodOverride());
 
 		// catch 404 and forward to error handler
-		this.app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-			err.status = 404;
-			next(err);
-		});
+		this.app.use(
+			(
+				err: any,
+				req: express.Request,
+				res: express.Response,
+				next: express.NextFunction,
+			) => {
+				err.status = 404;
+				next(err);
+			},
+		);
 
 		// error handling
 		this.app.use(errorHandler());

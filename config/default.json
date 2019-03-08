@@ -2,10 +2,11 @@
 	"name": "api",
 	"port": 3000,
 	"db": {
-		"database": "zendesk",
-		"host": "10.80.15.56",
+		"database": "centralbase",
+		"host": "192.168.0.65",
 		"user": "sa",
 		"password": "root",
+		"port": 1433,
 		"pool": {
 			"min": 1,
 			"max": 10,
