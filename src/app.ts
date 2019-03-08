@@ -33,7 +33,7 @@ export class Server {
 	 * @method bootstrap
 	 * @static
 	 */
-	public static bootstrap (): Server {
+	public static bootstrap(): Server {
 		return new Server();
 	}
 
@@ -45,7 +45,7 @@ export class Server {
 	 * @class Server
 	 * @constructor
 	 */
-	constructor () {
+	constructor() {
 		const self = this;
 		// create expressjs application
 		this.app = express();
@@ -59,6 +59,7 @@ export class Server {
 				.find()
 				.then(async (result) => {
 					for (const record of result) {
+						console.log(record);
 						Cache.set(record.key, record.value);
 					}
 
@@ -79,7 +80,7 @@ export class Server {
 	 * @class Server
 	 * @method config
 	 */
-	public schedule () {
+	public schedule() {
 		const execute: schedule.JobCallback = () => {
 			logger.info('execute job: %s', new Date());
 
@@ -115,7 +116,7 @@ export class Server {
 	 * @method config
 	 */
 
-	public config () {
+	public config() {
 		// add static paths
 		this.app.use(express.static(path.join(__dirname, 'public')));
 
@@ -168,7 +169,7 @@ export class Server {
 	 * @method routes
 	 * @return void
 	 */
-	private routes () {
+	private routes() {
 		let router: express.Router;
 		router = express.Router();
 

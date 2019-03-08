@@ -3,7 +3,8 @@
 	"port": 3000,
 	"db": {
 		"database": "centralbase",
-		"host": "192.168.0.65",
+		//		"host": "192.168.0.65",
+		"host": "10.80.15.56",
 		"user": "sa",
 		"password": "root",
 		"port": 1433,

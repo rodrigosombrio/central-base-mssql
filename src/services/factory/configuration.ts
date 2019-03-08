@@ -1,9 +1,7 @@
-import { Request } from 'mssql';
 import { Cache } from '../../cache';
-import { Brands } from '../../models/Brands';
 import { Configuration } from '../../models/Configuration';
-import { Logo } from '../../models/Logo';
 import { Database } from '../database';
+import DynamicModel from '../DynamicModel';
 import { logger } from '../index';
 import { Zendesk } from '../zendesk';
 
@@ -27,9 +25,7 @@ export class ConfigurationFactory {
 	}
 	private static run (url: string) {
 		Zendesk.json(url).then((result: any) => {
-			this.content = this.content.concat(
-				result[this.current.tableToParse.toLowerCase()],
-			);
+			this.content = this.content.concat(result[this.current.tableToParse.toLowerCase()]);
 			if (result.next_page) {
 				this.run(result.next_page);
 			} else {
@@ -37,45 +33,34 @@ export class ConfigurationFactory {
 			}
 		});
 	}
-	private static finish (index: number) {
-		console.log(index, this.content[index].logo);
+	private static finish (controller: number) {
 		const self = this;
-
 		async function save () {
-			if (self.content[index].logo) {
-				const logo = await db.manager.create(
-					Logo,
-					self.content[index].logo,
-				);
-				console.log('logo', logo);
-				if (await db.manager.hasId(logo)) {
-					await db.manager.update(
-						Logo,
-						{ id: logo.id },
-						self.content[index].logo,
-					);
-				} else {
-					await db.manager.save(logo);
-				}
-			}
-			const brands = await db.manager.create(Brands, self.content[index]);
-			if (await db.manager.hasId(brands)) {
-				await db.manager.update(
-					Brands,
-					{ id: brands.id },
-					self.content[index],
-				);
+			const conf = new Configuration();
+			conf.inExecution = true;
+			await db.manager.update(Configuration, {id: self.current.id}, conf);
+			const schema = new DynamicModel(self.current.tableToParse) as Function;
+			const entity: any = db.manager.create(schema, self.content[controller]);
+			const entitydb: any[] = await db.manager.find(schema, {id: entity.id});
+			if (entitydb.length > 0) {
+				await db.manager.update(schema, {id: entity.id}, self.content[controller]);
 			} else {
-				await db.manager.save(brands);
+				await db.manager.save(entity);
 			}
 		}
 
 		save().then(() => {
-			index++;
-			if (self.content.length > index) {
-				self.finish(index);
+			controller++;
+			if (self.content.length > controller) {
+				self.finish(controller);
 			} else {
+				self.current.inExecution = false;
+				self.current.lastExecuteAt = new Date();
 				self.content = [];
+				self.index++;
+				if (self.list.length > self.index) {
+					self.import();
+				}
 			}
 		});
 	}
