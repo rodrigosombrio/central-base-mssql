@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { Connection, ConnectionOptions, createConnection } from 'typeorm';
 import { Brands } from '../models/Brands';
 import { Configuration } from '../models/Configuration';
+import { Groups } from '../models/Groups';
 import { Params } from '../models/Params';
 import { TicketFields } from '../models/TicketFields';
 import { TicketForms } from '../models/TicketForms';
@@ -12,7 +13,7 @@ import { logger } from './index';
 const definitions: any = config.get('db');
 const params: ConnectionOptions = {
 	database: definitions.database,
-	entities: [Params, Configuration, Brands],
+	entities: [Params, Configuration, Brands, Groups],
 	host: definitions.host,
 	logging: false,
 	password: definitions.password,
