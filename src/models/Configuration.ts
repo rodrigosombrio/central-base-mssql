@@ -29,6 +29,9 @@ export class Configuration extends BaseEntity {
 	@Column()
 	public inExecution: boolean = false;
 
+	@Column({ nullable: true })
+	public active: boolean = true;
+
 	@Column('int')
 	public priority: number = 0;
 }

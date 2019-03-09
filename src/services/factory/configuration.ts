@@ -1,3 +1,4 @@
+import { type } from 'os';
 import { Cache } from '../../cache';
 import { Configuration } from '../../models/Configuration';
 import { Database } from '../database';
@@ -25,7 +26,9 @@ export class ConfigurationFactory {
 	}
 	private static run (url: string) {
 		Zendesk.json(url).then((result: any) => {
-			this.content = this.content.concat(result[this.current.tableToParse.toLowerCase()]);
+			this.content = this.content.concat(
+				result[this.current.tableToParse.toLowerCase()],
+			);
 			if (result.next_page) {
 				this.run(result.next_page);
 			} else {
@@ -38,14 +41,29 @@ export class ConfigurationFactory {
 		async function save () {
 			const conf = new Configuration();
 			conf.inExecution = true;
-			await db.manager.update(Configuration, {id: self.current.id}, conf);
-			const schema = new DynamicModel(self.current.tableToParse) as Function;
-			const entity: any = db.manager.create(schema, self.content[controller]);
-			const entitydb: any[] = await db.manager.find(schema, {id: entity.id});
-			if (entitydb.length > 0) {
-				await db.manager.update(schema, {id: entity.id}, self.content[controller]);
-			} else {
-				await db.manager.save(entity);
+			// 			await db.manager.update(Configuration, {id: self.current.id}, conf);
+			const dynamic = new DynamicModel(self.current.tableToParse);
+			const schema = dynamic.schema;
+			if (schema) {
+				console.log('create');
+				const entity: any = db.manager.create(
+					schema,
+					self.content[controller],
+				);
+				console.log('find', entity.id);
+				const entitydb: any[] = await db.manager.find(schema, {
+					id: entity.id,
+				});
+				console.log('entitydb.length', entitydb.length);
+				if (entitydb.length > 0) {
+					await db.manager.update(
+						schema,
+						{ id: entity.id },
+						self.content[controller],
+					);
+				} else {
+					await db.manager.save(entity);
+				}
 			}
 		}
 
@@ -58,6 +76,7 @@ export class ConfigurationFactory {
 				self.current.lastExecuteAt = new Date();
 				self.content = [];
 				self.index++;
+				console.log(self.index, self.list.length);
 				if (self.list.length > self.index) {
 					self.import();
 				}
