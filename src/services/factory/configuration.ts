@@ -38,12 +38,18 @@ export class ConfigurationFactory {
 		async function save () {
 			const conf = new Configuration();
 			conf.inExecution = true;
-			await db.manager.update(Configuration, {id: self.current.id}, conf);
+			// 			await db.manager.update(Configuration, { id: self.current.id }, conf);
 			const schema = new DynamicModel(self.current.tableToParse) as Function;
 			const entity: any = db.manager.create(schema, self.content[controller]);
-			const entitydb: any[] = await db.manager.find(schema, {id: entity.id});
-			if (entitydb.length > 0) {
-				await db.manager.update(schema, {id: entity.id}, self.content[controller]);
+
+			const entitydb: any = await db.manager
+				.createQueryBuilder(schema, 'schema')
+				.where('schema.id = :id', { id: entity.id })
+				.getOne();
+
+			// 			const entitydb: any[] = await db.manager.find(schema, { id: entity.id });
+			if (entitydb) {
+				await db.manager.update(schema, { id: entity.id }, self.content[controller]);
 			} else {
 				await db.manager.save(entity);
 			}
