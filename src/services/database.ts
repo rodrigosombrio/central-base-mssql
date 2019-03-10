@@ -7,13 +7,13 @@ import { Groups } from '../models/Groups';
 import { Params } from '../models/Params';
 import { TicketFields } from '../models/TicketFields';
 import { TicketForms } from '../models/TicketForms';
-import { TicketFormsOptions } from '../models/TicketFormsOptions';
+import { Users } from '../models/Users';
 import { logger } from './index';
 
 const definitions: any = config.get('db');
 const params: ConnectionOptions = {
 	database: definitions.database,
-	entities: [Params, Configuration, Brands, Groups],
+	entities: [Params, Users, Configuration, Brands, Groups],
 	host: definitions.host,
 	logging: false,
 	password: definitions.password,

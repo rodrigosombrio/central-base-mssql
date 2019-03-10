@@ -1,4 +1,3 @@
-import { type } from 'os';
 import { Cache } from '../../cache';
 import { Configuration } from '../../models/Configuration';
 import { Database } from '../database';
@@ -20,8 +19,12 @@ export class ConfigurationFactory {
 		if (this.list.length > 0) {
 			this.current = this.list[this.index];
 			const baseUri = Cache.get('baseUriZendesk');
+			let url = baseUri + this.current.url;
+			if (this.current.incremental !== undefined) {
+				url += '?incremental=' + this.current.incremental;
+			}
 
-			this.run(baseUri + this.current.url);
+			this.run(url);
 		}
 	}
 	private static run (url: string) {
@@ -30,7 +33,15 @@ export class ConfigurationFactory {
 			if (result.next_page) {
 				this.run(result.next_page);
 			} else {
-				this.finish(0);
+				if (this.current.beforeClean) {
+					const dynamic = new DynamicModel(this.current.tableToParse);
+					const schema = dynamic.schema;
+					db.manager.remove(schema).then(() => {
+						this.finish(0);
+					});
+				} else {
+					this.finish(0);
+				}
 			}
 		});
 	}
@@ -43,17 +54,11 @@ export class ConfigurationFactory {
 			const dynamic = new DynamicModel(self.current.tableToParse);
 			const schema = dynamic.schema;
 			if (schema) {
-				console.log('create');
 				const entity: any = db.manager.create(schema, self.content[controller]);
-				console.log('find', entity.id);
-				const entitydb: any[] = await db.manager.find(schema, {
-					id: entity.id,
-				});
-				console.log('entitydb.length', entitydb.length);
-				if (entitydb.length > 0) {
+				try {
+					await db.manager.save(schema, entity);
+				} catch (err) {
 					await db.manager.update(schema, { id: entity.id }, self.content[controller]);
-				} else {
-					await db.manager.save(entity);
 				}
 			}
 		}
@@ -70,6 +75,9 @@ export class ConfigurationFactory {
 				console.log(self.index, self.list.length);
 				if (self.list.length > self.index) {
 					self.import();
+				} else {
+					self.list = [];
+					self.index = 0;
 				}
 			}
 		});

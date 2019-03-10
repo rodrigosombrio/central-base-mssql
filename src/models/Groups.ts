@@ -1,9 +1,10 @@
-import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Groups extends BaseEntity {
-	@PrimaryColumn('bigint')
-	public id: BigInt;
+	@Index({ unique: true })
+	@Column('bigint')
+	public id: number = 0;
 
 	@Column()
 	public name: string = '';
@@ -14,7 +15,7 @@ export class Groups extends BaseEntity {
 	@Column('datetime')
 	public updated_at: Date = new Date();
 
-	@Column()
+	@PrimaryColumn()
 	public url: string = '';
 
 	@Column()
