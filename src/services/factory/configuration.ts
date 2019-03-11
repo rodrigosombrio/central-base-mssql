@@ -20,46 +20,89 @@ export class ConfigurationFactory {
 			this.current = this.list[this.index];
 			const baseUri = Cache.get('baseUriZendesk');
 			let url = baseUri + this.current.url;
-			if (this.current.incremental !== undefined) {
-				url += '?incremental=' + this.current.incremental;
+			if (this.current.incremental !== '') {
+				url += '?start_time=' + this.current.incremental;
+				this.incremental(url);
+			} else {
+				this.run(url);
 			}
-
-			this.run(url);
 		}
 	}
 	private static run (url: string) {
+		console.log('zendesk get', url);
+		Zendesk.json(url)
+			.then((result: any) => {
+				this.content = this.content.concat(result[this.current.tableToParse.toLowerCase()]);
+				if (result.next_page) {
+					this.run(result.next_page);
+				} else {
+					if (this.current.beforeClean) {
+						const dynamic = new DynamicModel(this.current.tableToParse);
+						const schema = dynamic.schema;
+						db.manager.remove(schema).then(() => {
+							this.finish(0, result.end_time);
+						});
+					} else {
+						this.finish(0, result.end_time);
+					}
+				}
+			})
+			.catch((err) => {
+				console.log('zendesk err', err);
+			});
+	}
+
+	private static incremental (url: string) {
+		console.log('zendesk incremental', url);
 		Zendesk.json(url).then((result: any) => {
 			this.content = this.content.concat(result[this.current.tableToParse.toLowerCase()]);
-			if (result.next_page) {
-				this.run(result.next_page);
+			console.log('url', url.indexOf(result.end_time));
+			if (result.next_page && url.indexOf(result.end_time) === -1) {
+				this.incremental(result.next_page);
 			} else {
 				if (this.current.beforeClean) {
 					const dynamic = new DynamicModel(this.current.tableToParse);
 					const schema = dynamic.schema;
 					db.manager.remove(schema).then(() => {
-						this.finish(0);
+						this.finish(0, result.end_time);
 					});
 				} else {
-					this.finish(0);
+					this.finish(0, result.end_time);
 				}
 			}
 		});
 	}
-	private static finish (controller: number) {
+
+	private static finish (controller: number, endTime: string) {
 		const self = this;
 		async function save () {
 			if (controller === 0) {
-				console.log('in execution');
-				await db.manager.update(Configuration, { id: self.current.id }, { inExecution: true });
+				console.log('in execution', endTime);
+				const config = { inExecution: true };
+				if (endTime && endTime !== '') {
+					config.incremental = endTime;
+				}
+				console.log('config', config);
+				await db.manager.update(Configuration, { id: self.current.id }, config);
 			}
 			const dynamic = new DynamicModel(self.current.tableToParse);
 			const schema = dynamic.schema;
 			if (schema) {
 				const entity: any = db.manager.create(schema, self.content[controller]);
-				try {
+
+				console.log('find');
+				const entitydb = await db.manager.find(schema, {
+					url: entity.url,
+				});
+				console.log('find ok ', entitydb);
+				if (entitydb.length > 0) {
+					console.log('update');
+					await db.manager.update(schema, { url: entity.url }, self.content[controller]);
+					console.log('update ok');
+				} else {
+					console.log('save');
 					await db.manager.save(schema, entity);
-				} catch (err) {
-					await db.manager.update(schema, { id: entity.id }, self.content[controller]);
+					console.log('save ok');
 				}
 			}
 			if (self.content.length <= controller + 1) {
@@ -75,7 +118,7 @@ export class ConfigurationFactory {
 		save().then(() => {
 			controller++;
 			if (self.content.length > controller) {
-				self.finish(controller);
+				self.finish(controller, '');
 			} else {
 				self.content = [];
 				self.index++;

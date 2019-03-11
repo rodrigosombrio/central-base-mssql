@@ -4,16 +4,17 @@ import { Connection, ConnectionOptions, createConnection } from 'typeorm';
 import { Brands } from '../models/Brands';
 import { Configuration } from '../models/Configuration';
 import { Groups } from '../models/Groups';
+import { GroupsMemberships } from '../models/GroupsMemberships';
+import { Organizations } from '../models/Organizations';
 import { Params } from '../models/Params';
-import { TicketFields } from '../models/TicketFields';
-import { TicketForms } from '../models/TicketForms';
+import { UserFields } from '../models/UserFields';
 import { Users } from '../models/Users';
 import { logger } from './index';
 
 const definitions: any = config.get('db');
 const params: ConnectionOptions = {
 	database: definitions.database,
-	entities: [Params, Users, Configuration, Brands, Groups],
+	entities: [Params, Users, Configuration, Brands, Groups, GroupsMemberships, UserFields, Organizations],
 	host: definitions.host,
 	logging: false,
 	password: definitions.password,

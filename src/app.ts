@@ -92,9 +92,7 @@ export class Server {
 					where: { active: true },
 				})
 				.then(async (configutarion) => {
-					console.log(configutarion);
 					for (const record of configutarion) {
-						console.log(record);
 						ConfigurationFactory.addRow(record);
 					}
 					ConfigurationFactory.import();
@@ -111,7 +109,7 @@ export class Server {
 					ConfigurationFactory.import();
 				});*/
 		};
-		schedule.scheduleJob('*/1 * * * *', execute);
+		schedule.scheduleJob('*/3 * * * *', execute);
 	}
 
 	/**
@@ -151,17 +149,10 @@ export class Server {
 		this.app.use(methodOverride());
 
 		// catch 404 and forward to error handler
-		this.app.use(
-			(
-				err: any,
-				req: express.Request,
-				res: express.Response,
-				next: express.NextFunction,
-			) => {
-				err.status = 404;
-				next(err);
-			},
-		);
+		this.app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+			err.status = 404;
+			next(err);
+		});
 
 		// error handling
 		this.app.use(errorHandler());

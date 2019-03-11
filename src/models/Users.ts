@@ -42,9 +42,9 @@ export class Users extends BaseEntity {
 	@Column({ nullable: true })
 	public locale: string = '';
 
-	@Index({ name: 'idx-organization' })
+	@Index('idx-organization')
 	@Column()
-	public organization_id: number = 0;
+	public organization_id: string = '';
 
 	@Column({ nullable: true })
 	public role: string = '';
@@ -52,7 +52,7 @@ export class Users extends BaseEntity {
 	@Column({ nullable: true })
 	public verified: boolean = false;
 
-	@Index({ name: 'idx-external' })
+	@Index('idx-external')
 	@Column({ nullable: true })
 	public external_id: string = '';
 
@@ -62,19 +62,19 @@ export class Users extends BaseEntity {
 	@Column({ nullable: true })
 	public alias: string = '';
 
-	@Column()
+	@Column({ nullable: true })
 	public active: boolean = false;
 
-	@Column()
+	@Column({ nullable: true })
 	public shared: boolean = false;
 
-	@Column()
+	@Column({ nullable: true })
 	public shared_agent: boolean = false;
 
 	@Column('datetime')
 	public last_login_at: Date = new Date();
 
-	@Column()
+	@Column({ nullable: true })
 	public two_factor_auth_enabled: boolean = false;
 
 	@Column({ nullable: true })
@@ -86,7 +86,7 @@ export class Users extends BaseEntity {
 	@Column({ type: 'text', nullable: true })
 	public notes: string = '';
 
-	@Index({ name: 'idx-role' })
+	@Index('idx-role')
 	@Column({ nullable: true })
 	public role_type: string = '';
 
@@ -109,7 +109,10 @@ export class Users extends BaseEntity {
 	public chat_only: boolean = false;
 
 	@Column({ nullable: true })
-	public default_group_id: number = 0;
+	public default_group_id: string = '';
+
+	@Column({ nullable: true })
+	public only_private_comments: boolean = false;
 
 	@Column()
 	public report_csv: boolean = false;
