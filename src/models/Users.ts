@@ -1,7 +1,7 @@
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 @Entity()
-export class Groups extends BaseEntity {
+export class Users extends BaseEntity {
 	@Index({ unique: true })
 	@Column('bigint')
 	public id: number = 0;

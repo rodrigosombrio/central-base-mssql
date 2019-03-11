@@ -48,9 +48,10 @@ export class ConfigurationFactory {
 	private static finish (controller: number) {
 		const self = this;
 		async function save () {
-			const conf = new Configuration();
-			conf.inExecution = true;
-			// 			await db.manager.update(Configuration, {id: self.current.id}, conf);
+			if (controller === 0) {
+				console.log('in execution');
+				await db.manager.update(Configuration, { id: self.current.id }, { inExecution: true });
+			}
 			const dynamic = new DynamicModel(self.current.tableToParse);
 			const schema = dynamic.schema;
 			if (schema) {
@@ -61,6 +62,14 @@ export class ConfigurationFactory {
 					await db.manager.update(schema, { id: entity.id }, self.content[controller]);
 				}
 			}
+			if (self.content.length <= controller + 1) {
+				console.log('update finish');
+				await db.manager.update(
+					Configuration,
+					{ id: self.current.id },
+					{ inExecution: false, lastExecuteAt: new Date() },
+				);
+			}
 		}
 
 		save().then(() => {
@@ -68,8 +77,6 @@ export class ConfigurationFactory {
 			if (self.content.length > controller) {
 				self.finish(controller);
 			} else {
-				self.current.inExecution = false;
-				self.current.lastExecuteAt = new Date();
 				self.content = [];
 				self.index++;
 				console.log(self.index, self.list.length);
