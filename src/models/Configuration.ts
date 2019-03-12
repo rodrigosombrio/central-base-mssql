@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Logs } from './Logs';
 
 @Entity()
 export class Configuration extends BaseEntity {
@@ -34,4 +35,7 @@ export class Configuration extends BaseEntity {
 
 	@Column('int')
 	public priority: number = 0;
+
+	@OneToMany((type) => Logs, (logs) => logs.config)
+	public logs: Logs = new Logs();
 }

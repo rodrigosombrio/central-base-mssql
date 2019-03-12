@@ -5,6 +5,9 @@ import { Brands } from '../models/Brands';
 import { Configuration } from '../models/Configuration';
 import { Groups } from '../models/Groups';
 import { GroupsMemberships } from '../models/GroupsMemberships';
+import { Logs } from '../models/Logs';
+import { OrganizationFields } from '../models/OrganizationFields';
+import { OrganizationMemberships } from '../models/OrganizationMemberships';
 import { Organizations } from '../models/Organizations';
 import { Params } from '../models/Params';
 import { UserFields } from '../models/UserFields';
@@ -14,7 +17,19 @@ import { logger } from './index';
 const definitions: any = config.get('db');
 const params: ConnectionOptions = {
 	database: definitions.database,
-	entities: [Params, Users, Configuration, Brands, Groups, GroupsMemberships, UserFields, Organizations],
+	entities: [
+		Params,
+		Users,
+		Logs,
+		Configuration,
+		Brands,
+		Groups,
+		GroupsMemberships,
+		UserFields,
+		Organizations,
+		OrganizationFields,
+		OrganizationMemberships,
+	],
 	host: definitions.host,
 	logging: false,
 	password: definitions.password,

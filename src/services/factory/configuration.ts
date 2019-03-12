@@ -2,6 +2,7 @@ import { Cache } from '../../cache';
 import { Configuration } from '../../models/Configuration';
 import { Database } from '../database';
 import DynamicModel from '../DynamicModel';
+import { log } from '../factory/logs';
 import { logger } from '../index';
 import { Zendesk } from '../zendesk';
 
@@ -29,22 +30,14 @@ export class ConfigurationFactory {
 		}
 	}
 	private static run (url: string) {
-		console.log('zendesk get', url);
+		console.log('run', url);
 		Zendesk.json(url)
 			.then((result: any) => {
 				this.content = this.content.concat(result[this.current.tableToParse.toLowerCase()]);
 				if (result.next_page) {
 					this.run(result.next_page);
 				} else {
-					if (this.current.beforeClean) {
-						const dynamic = new DynamicModel(this.current.tableToParse);
-						const schema = dynamic.schema;
-						db.manager.remove(schema).then(() => {
-							this.finish(0, result.end_time);
-						});
-					} else {
-						this.finish(0, result.end_time);
-					}
+					this.finish(0, result.end_time, this.current.beforeClean);
 				}
 			})
 			.catch((err) => {
@@ -53,76 +46,73 @@ export class ConfigurationFactory {
 	}
 
 	private static incremental (url: string) {
-		console.log('zendesk incremental', url);
-		Zendesk.json(url).then((result: any) => {
-			this.content = this.content.concat(result[this.current.tableToParse.toLowerCase()]);
-			console.log('url', url.indexOf(result.end_time));
-			if (result.next_page && url.indexOf(result.end_time) === -1) {
-				this.incremental(result.next_page);
-			} else {
-				if (this.current.beforeClean) {
-					const dynamic = new DynamicModel(this.current.tableToParse);
-					const schema = dynamic.schema;
-					db.manager.remove(schema).then(() => {
-						this.finish(0, result.end_time);
-					});
+		Zendesk.json(url)
+			.then((result: any) => {
+				this.content = this.content.concat(result[this.current.tableToParse.toLowerCase()]);
+				if (result.next_page && url.indexOf(result.end_time) === -1) {
+					this.incremental(result.next_page);
 				} else {
-					this.finish(0, result.end_time);
+					this.finish(0, result.end_time, this.current.beforeClean);
 				}
-			}
-		});
+			})
+			.catch((err) => {
+				console.log('zendesk err', err);
+			});
 	}
 
-	private static finish (controller: number, endTime: string) {
+	private static finish (controller: number, endTime: string, clean: boolean) {
+		console.log('finish', controller, clean);
 		const self = this;
 		async function save () {
 			if (controller === 0) {
-				console.log('in execution', endTime);
+				await log('START', self.current, '', '');
 				const config = { inExecution: true };
 				if (endTime && endTime !== '') {
 					config.incremental = endTime;
 				}
-				console.log('config', config);
 				await db.manager.update(Configuration, { id: self.current.id }, config);
+				// await db.manager.save(Logs, { id: self.current.id }, config);
 			}
 			const dynamic = new DynamicModel(self.current.tableToParse);
 			const schema = dynamic.schema;
 			if (schema) {
+				console.log('schema', schema);
+				if (clean) {
+					console.log('remove');
+					await db.manager.remove(schema);
+					console.log('remove ok');
+				}
+
 				const entity: any = db.manager.create(schema, self.content[controller]);
 
-				console.log('find');
 				const entitydb = await db.manager.find(schema, {
 					url: entity.url,
 				});
-				console.log('find ok ', entitydb);
 				if (entitydb.length > 0) {
-					console.log('update');
+					await log('UPDATE', self.current, JSON.stringify(self.content[controller]), entity.url);
 					await db.manager.update(schema, { url: entity.url }, self.content[controller]);
-					console.log('update ok');
 				} else {
-					console.log('save');
+					await log('INSERT', self.current, self.content[controller], entity.url);
 					await db.manager.save(schema, entity);
-					console.log('save ok');
 				}
 			}
 			if (self.content.length <= controller + 1) {
-				console.log('update finish');
 				await db.manager.update(
 					Configuration,
 					{ id: self.current.id },
 					{ inExecution: false, lastExecuteAt: new Date() },
 				);
+				await log('FINISH', self.current, '', '');
 			}
 		}
 
 		save().then(() => {
 			controller++;
 			if (self.content.length > controller) {
-				self.finish(controller, '');
+				self.finish(controller, '', false);
 			} else {
 				self.content = [];
 				self.index++;
-				console.log(self.index, self.list.length);
 				if (self.list.length > self.index) {
 					self.import();
 				} else {
