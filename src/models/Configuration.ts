@@ -36,6 +36,6 @@ export class Configuration extends BaseEntity {
 	@Column('int')
 	public priority: number = 0;
 
-	@OneToMany((type) => Logs, (logs) => logs.config)
-	public logs: Logs = new Logs();
+	@Column({ nullable: true, type: 'int' })
+	public lastPage: number = 0;
 }

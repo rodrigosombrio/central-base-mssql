@@ -53,6 +53,7 @@ export class Server {
 		db.connect((err) => {
 			if (err) {
 				logger.info('Erro ao conectar o banco!');
+				console.log(err);
 			}
 
 			db.repository(Params)

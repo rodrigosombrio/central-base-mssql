@@ -1,12 +1,11 @@
 import { BaseEntity, Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import { TicketFormsOptions } from './TicketFormsOptions';
 
 @Entity()
 export class TicketFields extends BaseEntity {
-	@Column()
+	@PrimaryColumn()
 	public url: string = '';
 
-	@PrimaryColumn('bigint')
+	@Column({ type: 'bigint', unique: true })
 	public id: number = 0;
 
 	@Column()
@@ -16,12 +15,12 @@ export class TicketFields extends BaseEntity {
 	public title: string = '';
 
 	@Column()
-	public raw_type: string = '';
+	public raw_title: string = '';
 
-	@Column()
+	@Column({ type: 'text', nullable: true })
 	public description: string = '';
 
-	@Column()
+	@Column({ type: 'text', nullable: true })
 	public raw_description: string = '';
 
 	@Column()
@@ -69,9 +68,12 @@ export class TicketFields extends BaseEntity {
 	@Column({ nullable: true })
 	public agent_description: string = '';
 
-	@OneToMany(
-		(type) => TicketFormsOptions,
-		(custom_field_options) => custom_field_options.ticket_fields,
-	)
-	public custom_field_options: TicketFormsOptions[] = [];
+	@Column({ nullable: true, type: 'simple-json' })
+	public custom_field_options: string = '';
+
+	@Column({ nullable: true, type: 'simple-array' })
+	public system_field_options: string = '';
+
+	@Column({ nullable: true })
+	public sub_type_id: number = 0;
 }

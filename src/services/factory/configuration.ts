@@ -30,7 +30,6 @@ export class ConfigurationFactory {
 		}
 	}
 	private static run (url: string) {
-		console.log('run', url);
 		Zendesk.json(url)
 			.then((result: any) => {
 				this.content = this.content.concat(result[this.current.tableToParse.toLowerCase()]);
@@ -46,6 +45,7 @@ export class ConfigurationFactory {
 	}
 
 	private static incremental (url: string) {
+		console.log('run', url);
 		Zendesk.json(url)
 			.then((result: any) => {
 				this.content = this.content.concat(result[this.current.tableToParse.toLowerCase()]);
@@ -64,6 +64,7 @@ export class ConfigurationFactory {
 		console.log('finish', controller, clean);
 		const self = this;
 		async function save () {
+			// 	try {
 			if (controller === 0) {
 				await log('START', self.current, '', '');
 				const config = { inExecution: true };
@@ -76,7 +77,6 @@ export class ConfigurationFactory {
 			const dynamic = new DynamicModel(self.current.tableToParse);
 			const schema = dynamic.schema;
 			if (schema) {
-				console.log('schema', schema);
 				if (clean) {
 					console.log('remove');
 					await db.manager.remove(schema);
@@ -84,15 +84,17 @@ export class ConfigurationFactory {
 				}
 
 				const entity: any = db.manager.create(schema, self.content[controller]);
-
+				const key = entity.url ? entity.url : entity.id;
 				const entitydb = await db.manager.find(schema, {
 					url: entity.url,
 				});
 				if (entitydb.length > 0) {
-					await log('UPDATE', self.current, JSON.stringify(self.content[controller]), entity.url);
-					await db.manager.update(schema, { url: entity.url }, self.content[controller]);
+					console.log('update', entity);
+					await log('UPDATE', self.current, JSON.stringify(self.content[controller]), key);
+					await db.manager.update(schema, { url: key }, self.content[controller]);
 				} else {
-					await log('INSERT', self.current, self.content[controller], entity.url);
+					console.log('save', entity);
+					await log('INSERT', self.current, entity, key);
 					await db.manager.save(schema, entity);
 				}
 			}
@@ -104,6 +106,9 @@ export class ConfigurationFactory {
 				);
 				await log('FINISH', self.current, '', '');
 			}
+			/*		} catch (err) {
+				await log('ERROR', self.current, JSON.stringify(err), JSON.stringify(self.content[controller]));
+			}*/
 		}
 
 		save().then(() => {

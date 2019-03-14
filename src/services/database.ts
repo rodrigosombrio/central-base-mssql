@@ -10,6 +10,9 @@ import { OrganizationFields } from '../models/OrganizationFields';
 import { OrganizationMemberships } from '../models/OrganizationMemberships';
 import { Organizations } from '../models/Organizations';
 import { Params } from '../models/Params';
+import { TicketEvents } from '../models/TicketEvents';
+import { TicketFields } from '../models/TicketFields';
+import { Tickets } from '../models/Tickets';
 import { UserFields } from '../models/UserFields';
 import { Users } from '../models/Users';
 import { logger } from './index';
@@ -29,6 +32,9 @@ const params: ConnectionOptions = {
 		Organizations,
 		OrganizationFields,
 		OrganizationMemberships,
+		Tickets,
+		TicketEvents,
+		TicketFields,
 	],
 	host: definitions.host,
 	logging: false,
