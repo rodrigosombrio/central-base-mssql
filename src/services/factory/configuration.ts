@@ -1,10 +1,13 @@
-import { Cache } from '../../cache';
 import { Configuration } from '../../models/Configuration';
 import { Database } from '../database';
 import DynamicModel from '../DynamicModel';
 import { log } from '../factory/logs';
 import { logger } from '../index';
 import { Zendesk } from '../zendesk';
+import { HelpCenter } from './helpcenter';
+import { Incremental } from './incremental';
+import { Page } from './page';
+import { Support } from './support';
 
 const db: Database = new Database();
 
@@ -16,17 +19,24 @@ export class ConfigurationFactory {
 	public static addRow (config: Configuration) {
 		this.list.push(config);
 	}
-	public static import () {
+	public static getInstance (config: Configuration): any {
+		if (config.is_helpcenter) { return new HelpCenter(config); }
+		else if (config.incremental !== '') { return new Incremental(config); }
+		else if (config.lastPage > 0) { return new Page(config); }
+		return new Support(config);
+	}
+	public static start () {
+		const self = this;
 		if (this.list.length > 0) {
 			this.current = this.list[this.index];
-			const baseUri = Cache.get('baseUriZendesk');
-			let url = baseUri + this.current.url;
-			if (this.current.incremental !== '') {
-				url += '?start_time=' + this.current.incremental;
-				this.incremental(url);
-			} else {
-				this.run(url);
-			}
+			const instance = ConfigurationFactory.getInstance(this.current);
+			console.log('instance', instance)
+			instance.import().then(() => {
+				self.index++;
+				if (self.list.length > self.index) {
+					this.start();
+				}
+			})
 		}
 	}
 	private static run (url: string) {
@@ -130,4 +140,5 @@ export class ConfigurationFactory {
 	constructor () {
 		logger.info('db %s', 'zendesk');
 	}
+	
 }

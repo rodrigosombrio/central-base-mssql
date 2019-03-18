@@ -38,4 +38,8 @@ export class Configuration extends BaseEntity {
 
 	@Column({ nullable: true, type: 'int' })
 	public lastPage: number = 0;
+
+	@Column({ nullable: true })
+	public is_helpcenter: boolean = false;
+
 }

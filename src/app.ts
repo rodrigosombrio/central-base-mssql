@@ -90,13 +90,13 @@ export class Server {
 					order: {
 						priority: 'ASC',
 					},
-					where: { active: true },
+					where: { active: true, inExecution: false },
 				})
 				.then(async (configutarion) => {
 					for (const record of configutarion) {
 						ConfigurationFactory.addRow(record);
 					}
-					ConfigurationFactory.import();
+					ConfigurationFactory.start();
 				});
 
 			/*			const request: Request = db.request;
