@@ -1,3 +1,4 @@
+import { URLSearchParams } from 'url';
 import { Cache } from '../../cache';
 import { IZendeskImport } from '../../interface/IZendeskImport';
 import { Configuration } from '../../models/Configuration';
@@ -38,7 +39,8 @@ export class Page implements IZendeskImport {
             if (result.next_page) {
                 url = result.next_page;
             } else {
-                this._page = +(url.substring(url.lastIndexOf('=') + 1));
+                const u = new URLSearchParams(url);
+				this._page = +u.get('page');
                 next = false;
             }
         }

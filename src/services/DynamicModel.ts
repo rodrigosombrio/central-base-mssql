@@ -1,4 +1,5 @@
 import { BaseEntity } from 'typeorm';
+import { Articles } from '../models/Articles';
 import { Brands } from '../models/Brands';
 import { Categories } from '../models/Categories';
 import { Groups } from '../models/Groups';
@@ -16,6 +17,7 @@ import { Users } from '../models/Users';
 import { CustomeTickets } from './customization/tickets';
 
 const classes = {
+	articles: Articles,
 	brands: Brands,
 	categories: Categories,
 	group_memberships: GroupsMemberships,
@@ -34,7 +36,7 @@ const classes = {
 
 const customization = {
 	tickets: CustomeTickets,
-}
+};
 
 export default class DynamicModel {
 	private _schema: BaseEntity;

@@ -1,6 +1,7 @@
 import config from 'config';
 import 'reflect-metadata';
 import { Connection, ConnectionOptions, createConnection } from 'typeorm';
+import { Articles } from '../models/Articles';
 import { Brands } from '../models/Brands';
 import { Categories } from '../models/Categories';
 import { Configuration } from '../models/Configuration';
@@ -40,7 +41,8 @@ const params: ConnectionOptions = {
 		TicketFields,
 		Locales,
 		Categories,
-		Sections
+		Sections,
+		Articles,
 	],
 	host: definitions.host,
 	logging: false,
