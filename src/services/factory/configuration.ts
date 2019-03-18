@@ -61,26 +61,22 @@ export class ConfigurationFactory {
 	}
 
 	private static finish (controller: number, endTime: string, clean: boolean) {
-		console.log('finish', controller, clean);
 		const self = this;
 		async function save () {
 			if (controller === 0) {
 				await log('START', self.current, '', '');
-				const config = { inExecution: true };
+				const config = {inExecution: true};
 				if (endTime && endTime !== '') {
 					config.incremental = endTime;
 				}
-				await db.manager.update(Configuration, { id: self.current.id }, config);
+				await db.manager.update(Configuration, {id: self.current.id}, config);
 				// await db.manager.save(Logs, { id: self.current.id }, config);
 			}
 			const dynamic = new DynamicModel(self.current.tableToParse);
 			const schema = dynamic.schema;
 			if (schema) {
-				console.log('schema', schema);
 				if (clean) {
-					console.log('remove');
 					await db.manager.remove(schema);
-					console.log('remove ok');
 				}
 
 				const entity: any = db.manager.create(schema, self.content[controller]);
@@ -90,7 +86,7 @@ export class ConfigurationFactory {
 				});
 				if (entitydb.length > 0) {
 					await log('UPDATE', self.current, JSON.stringify(self.content[controller]), entity.url);
-					await db.manager.update(schema, { url: entity.url }, self.content[controller]);
+					await db.manager.update(schema, {url: entity.url}, self.content[controller]);
 				} else {
 					await log('INSERT', self.current, self.content[controller], entity.url);
 					await db.manager.save(schema, entity);
@@ -99,8 +95,8 @@ export class ConfigurationFactory {
 			if (self.content.length <= controller + 1) {
 				await db.manager.update(
 					Configuration,
-					{ id: self.current.id },
-					{ inExecution: false, lastExecuteAt: new Date() },
+					{id: self.current.id},
+					{inExecution: false, lastExecuteAt: new Date()},
 				);
 				await log('FINISH', self.current, '', '');
 			}

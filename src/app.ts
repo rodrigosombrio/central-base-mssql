@@ -89,10 +89,10 @@ export class Server {
 					order: {
 						priority: 'ASC',
 					},
-					where: { active: true },
+					where: {active: true},
 				})
-				.then(async (configutarion) => {
-					for (const record of configutarion) {
+				.then(async (configuration) => {
+					for (const record of configuration) {
 						ConfigurationFactory.addRow(record);
 					}
 					ConfigurationFactory.import();
@@ -133,7 +133,7 @@ export class Server {
 		);
 
 		// mount json form parser
-		this.app.use(bodyParser.json({ limit: '50mb' }));
+		this.app.use(bodyParser.json({limit: '50mb'}));
 
 		// mount query string parser
 		this.app.use(

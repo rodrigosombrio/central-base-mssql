@@ -1,3 +1,4 @@
+import { BaseEntity } from 'typeorm';
 import { Brands } from '../models/Brands';
 import { Groups } from '../models/Groups';
 import { GroupsMemberships } from '../models/GroupsMemberships';
