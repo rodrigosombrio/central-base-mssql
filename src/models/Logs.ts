@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Configuration } from './Configuration';
 
 @Entity()
@@ -6,7 +6,7 @@ export class Logs extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	public id: number = 0;
 
-	@Column()
+	@Column({ type: 'text', nullable: true })
 	public key: string = '';
 
 	@Column({ type: 'datetime', nullable: true })
@@ -18,6 +18,7 @@ export class Logs extends BaseEntity {
 	@Column({ type: 'text', nullable: true })
 	public details: string = '';
 
-	@ManyToOne((type) => Configuration, (config) => config.logs)
-	public config: Configuration = new Configuration();
+	@Index()
+	@Column({ nullable: true })
+	public configId: number = 0;
 }

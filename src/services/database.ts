@@ -1,15 +1,22 @@
 import config from 'config';
 import 'reflect-metadata';
 import { Connection, ConnectionOptions, createConnection } from 'typeorm';
+import { Articles } from '../models/Articles';
 import { Brands } from '../models/Brands';
+import { Categories } from '../models/Categories';
 import { Configuration } from '../models/Configuration';
 import { Groups } from '../models/Groups';
 import { GroupsMemberships } from '../models/GroupsMemberships';
+import { Locales } from '../models/Locales';
 import { Logs } from '../models/Logs';
 import { OrganizationFields } from '../models/OrganizationFields';
 import { OrganizationMemberships } from '../models/OrganizationMemberships';
 import { Organizations } from '../models/Organizations';
 import { Params } from '../models/Params';
+import { Sections } from '../models/Sections';
+import { TicketEvents } from '../models/TicketEvents';
+import { TicketFields } from '../models/TicketFields';
+import { Tickets } from '../models/Tickets';
 import { UserFields } from '../models/UserFields';
 import { Users } from '../models/Users';
 import { logger } from './index';
@@ -29,6 +36,13 @@ const params: ConnectionOptions = {
 		Organizations,
 		OrganizationFields,
 		OrganizationMemberships,
+		Tickets,
+		TicketEvents,
+		TicketFields,
+		Locales,
+		Categories,
+		Sections,
+		Articles,
 	],
 	host: definitions.host,
 	logging: false,

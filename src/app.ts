@@ -53,6 +53,7 @@ export class Server {
 		db.connect((err) => {
 			if (err) {
 				logger.info('Erro ao conectar o banco!');
+				console.log(err);
 			}
 
 			db.repository(Params)
@@ -89,13 +90,13 @@ export class Server {
 					order: {
 						priority: 'ASC',
 					},
-					where: {active: true},
+					where: { active: true, inExecution: false },
 				})
 				.then(async (configuration) => {
 					for (const record of configuration) {
 						ConfigurationFactory.addRow(record);
 					}
-					ConfigurationFactory.import();
+					ConfigurationFactory.start();
 				});
 
 			/*			const request: Request = db.request;
