@@ -29,6 +29,8 @@ export class Page implements IZendeskImport {
 		return result;
 	}
 	public async run () {
+		const config = { inExecution: true };
+		await db.manager.update(Configuration, { id: this._config.id }, config);
 		let next: boolean = true;
 		let url: string = this._url;
 		while (next) {
@@ -39,8 +41,10 @@ export class Page implements IZendeskImport {
 			if (result.next_page) {
 				url = result.next_page;
 			} else {
-				const u = new URLSearchParams(url);
+				const u = new URLSearchParams(url.substring(url.lastIndexOf('?')));
+				console.log('u', u, u.get('page'));
 				this._page = +u.get('page');
+				console.log('u', this._page);
 				next = false;
 			}
 		}
@@ -48,8 +52,6 @@ export class Page implements IZendeskImport {
 		return f;
 	}
 	public async saveDb () {
-		const config = { inExecution: true };
-		await db.manager.update(Configuration, { id: this._config.id }, config);
 		await log('START', this._config, '', '');
 		for (const content of this._content) {
 			try {
