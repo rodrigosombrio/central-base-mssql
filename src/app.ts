@@ -80,8 +80,8 @@ export class Server {
 					},
 					where: { active: true, inExecution: false },
 				})
-				.then(async (configutarion) => {
-					for (const record of configutarion) {
+				.then(async (configuration) => {
+					for (const record of configuration) {
 						ConfigurationFactory.addRow(record);
 					}
 					ConfigurationFactory.start();
