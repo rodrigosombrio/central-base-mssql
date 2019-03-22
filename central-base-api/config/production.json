@@ -1,0 +1,17 @@
+{
+	"name": "central-base-api",
+	"port": 3001,
+	"db": {
+		"database": "centralbase",
+		"host": "192.168.0.65",
+		"user": "sa",
+		"password": "root",
+		"port": 1433,
+		"pool": {
+			"min": 1,
+			"max": 10,
+			"idleTimeoutMillis": 60000
+		},
+		"encrypt": false
+	}
+}
