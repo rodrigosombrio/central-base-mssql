@@ -2,12 +2,12 @@ import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class TicketsComments extends BaseEntity {
-	@Index({ unique: true })
-	@Column('bigint')
-	public id: number = 0;
-
 	@Column({ nullable: true })
 	public type: string = '';
+
+	@Index({ unique: true })
+	@PrimaryColumn()
+	public id: string = '';
 
 	@Column({ type: 'bigint', nullable: true })
 	public author_id: number = 0;

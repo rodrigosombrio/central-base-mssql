@@ -18,6 +18,8 @@ import { Sections } from '../models/Sections';
 import { TicketEvents } from '../models/TicketEvents';
 import { TicketFields } from '../models/TicketFields';
 import { Tickets } from '../models/Tickets';
+import { TicketsAudits } from '../models/TicketsAudits';
+import { TicketsComments } from '../models/TicketsComments';
 import { UserFields } from '../models/UserFields';
 import { Users } from '../models/Users';
 
@@ -37,6 +39,8 @@ const params: SqlServerConnectionOptions = {
 		OrganizationFields,
 		OrganizationMemberships,
 		Tickets,
+		TicketsAudits,
+		TicketsComments,
 		TicketEvents,
 		TicketFields,
 		Locales,

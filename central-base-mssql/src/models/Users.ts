@@ -9,10 +9,12 @@ export class Users extends BaseEntity {
 	@PrimaryColumn()
 	public url: string = '';
 
-	@Column('idx-name')
+	@Index('idx-name')
+	@Column()
 	public name: string = '';
 
-	@Column('idx-email')
+	@Index('idx-email')
+	@Column()
 	public email: string = '';
 
 	@Column('datetime')

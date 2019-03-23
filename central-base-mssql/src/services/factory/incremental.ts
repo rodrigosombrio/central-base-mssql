@@ -31,7 +31,7 @@ export class Incremental implements IZendeskImport {
 		let next: boolean = true;
 		let url: string = this._url;
 		while (next) {
-			logger.info('url incremental', url);
+			console.log('url incremental', url);
 			const result: any = await Zendesk.json(url);
 			const items = result[this._config.tableToParse.toLowerCase()];
 			this._content = this._content.concat(items);
@@ -46,8 +46,8 @@ export class Incremental implements IZendeskImport {
 		return f;
 	}
 	public async saveDb () {
-		const config = {inExecution: true};
-		await db.manager.update(Configuration, {id: this._config.id}, config);
+		const config = { inExecution: true };
+		await db.manager.update(Configuration, { id: this._config.id }, config);
 		await log('START', this._config, '', '');
 		for (const content of this._content) {
 			try {
@@ -65,13 +65,14 @@ export class Incremental implements IZendeskImport {
 					});
 					if (entitydb.length > 0) {
 						await log('UPDATE', this._config, JSON.stringify(content), key);
-						await db.manager.update(schema, {url: key}, content);
+						await db.manager.update(schema, { url: key }, content);
 					} else {
 						await log('INSERT', this._config, entity, key);
 						await db.manager.save(schema, entity);
 					}
 					if (dynamic.customization) {
-						console.log('customization', dynamic.customization)
+						console.log('customization save');
+						await dynamic.customization.run('save', entity);
 					}
 				}
 			} catch (err) {
@@ -80,8 +81,8 @@ export class Incremental implements IZendeskImport {
 		}
 		await db.manager.update(
 			Configuration,
-			{id: this._config.id},
-			{inExecution: false, lastExecuteAt: new Date(), incremental: this._endTime},
+			{ id: this._config.id },
+			{ inExecution: false, lastExecuteAt: new Date(), incremental: this._endTime },
 		);
 		await log('FINISH', this._config, '', '');
 

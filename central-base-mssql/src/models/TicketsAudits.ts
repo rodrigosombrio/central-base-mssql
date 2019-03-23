@@ -3,7 +3,7 @@ import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 @Entity()
 export class TicketsAudits extends BaseEntity {
 	@Index({ unique: true })
-	@Column('bigint')
+	@PrimaryColumn('bigint')
 	public id: number = 0;
 
 	@Column({ type: 'bigint', nullable: true })
@@ -53,5 +53,4 @@ export class TicketsAudits extends BaseEntity {
 
 	@Column({ nullable: true, type: 'simple-array' })
 	public events: object[] = [];
-
 }

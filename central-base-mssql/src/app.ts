@@ -41,6 +41,7 @@ export class Server {
 		db.connect((err) => {
 			if (err) {
 				logger.error('Erro ao conectar o banco!');
+				console.log(err);
 			}
 
 			db.repository(Params)
@@ -57,6 +58,7 @@ export class Server {
 					self.config();
 				});
 		});
+		return this.app;
 	}
 
 	public schedule () {
@@ -68,7 +70,7 @@ export class Server {
 					order: {
 						priority: 'ASC',
 					},
-					where: {active: true, inExecution: false},
+					where: { active: true, inExecution: false },
 				})
 				.then(async (configuration) => {
 					let record: {};
@@ -78,7 +80,7 @@ export class Server {
 					ConfigurationFactory.start();
 				});
 		};
-		schedule.scheduleJob('*/3 * * * *', execute);
+		schedule.scheduleJob('*/2 * * * *', execute);
 	}
 
 	public config () {
@@ -92,7 +94,7 @@ export class Server {
 			} as morgan.Options),
 		);
 
-		this.app.use(bodyParser.json({limit: '50mb'}));
+		this.app.use(bodyParser.json({ limit: '50mb' }));
 		this.app.use(
 			bodyParser.urlencoded({
 				extended: true,
