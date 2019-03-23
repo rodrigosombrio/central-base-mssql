@@ -70,6 +70,9 @@ export class Incremental implements IZendeskImport {
 						await log('INSERT', this._config, entity, key);
 						await db.manager.save(schema, entity);
 					}
+					if (dynamic.customization) {
+						console.log('customization', dynamic.customization)
+					}
 				}
 			} catch (err) {
 				await log('ERROR', this._config, err, this._config.id.toString());

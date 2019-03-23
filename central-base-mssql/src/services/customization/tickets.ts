@@ -1,3 +1,4 @@
+import { Tickets } from '../../models/Tickets';
 import { logger } from '../logger';
 
 export class CustomizationTickets {
@@ -5,7 +6,7 @@ export class CustomizationTickets {
 		logger.info('in customization tickets');
 	}
 
-	public run (event: string) {
+	public run (event: string, data: Tickets) {
 		return event;
 	}
 }
