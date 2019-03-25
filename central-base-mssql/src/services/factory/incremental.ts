@@ -1,9 +1,9 @@
+import { BaseEntity } from 'typeorm';
 import { Cache } from '../../cache';
 import { IZendeskImport } from '../../interface/IZendeskImport';
 import { Configuration } from '../../models/Configuration';
 import { Database } from '../database';
 import DynamicModel from '../DynamicModel';
-import { logger } from '../logger';
 import { Zendesk } from '../zendesk';
 import { log } from './logs';
 
@@ -58,21 +58,13 @@ export class Incremental implements IZendeskImport {
 						await db.manager.remove(schema);
 					}
 
-					const entity: any = db.manager.create(schema, content);
-					const key = entity.url ? entity.url : entity.id;
-					const entitydb = await db.manager.find(schema, {
-						url: entity.url,
-					});
-					if (entitydb.length > 0) {
-						await log('UPDATE', this._config, JSON.stringify(content), key);
-						await db.manager.update(schema, { url: key }, content);
+					const entity = await db.saveDb(schema, content, { url: content.url });
+					if (entity instanceof BaseEntity) {
+						if (dynamic.customization) {
+							await dynamic.customization.run('save', entity);
+						}
 					} else {
-						await log('INSERT', this._config, entity, key);
-						await db.manager.save(schema, entity);
-					}
-					if (dynamic.customization) {
-						console.log('customization save');
-						await dynamic.customization.run('save', entity);
+						await log('ERROR', this._config, JSON.stringify(entity), this._config.id.toString());
 					}
 				}
 			} catch (err) {

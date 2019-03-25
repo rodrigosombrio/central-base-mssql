@@ -9,6 +9,7 @@ import { OrganizationFields } from '../models/OrganizationFields';
 import { OrganizationMemberships } from '../models/OrganizationMemberships';
 import { Organizations } from '../models/Organizations';
 import { Sections } from '../models/Sections';
+import { SlaPolicies } from '../models/SlaPolicies';
 import { TicketEvents } from '../models/TicketEvents';
 import { TicketFields } from '../models/TicketFields';
 import { Tickets } from '../models/Tickets';
@@ -27,6 +28,7 @@ export interface IClasses {
 	organization_memberships: any;
 	organizations: any;
 	sections: any;
+	sla_policies: any,
 	ticket_events: any;
 	ticket_fields: any;
 	tickets: any;
@@ -49,6 +51,7 @@ const classes: IClasses = {
 	organization_memberships: OrganizationMemberships,
 	organizations: Organizations,
 	sections: Sections,
+	sla_policies: SlaPolicies,
 	ticket_events: TicketEvents,
 	ticket_fields: TicketFields,
 	tickets: Tickets,

@@ -22,6 +22,9 @@ import {
 	OrganizationsController,
 	TicketFieldsController,
 	UserFieldsController,
+	AuditsController,
+	SlaController,
+	TicketsController,
 } from './routes';
 import { UsersController } from './routes/users.route';
 import { Database } from './services/database';
@@ -78,6 +81,9 @@ export class Server {
 		this.app.use('/organization_memberships', OrganizationMembershipsController);
 		this.app.use('/group_memberships', GroupsMembershipsController);
 		this.app.use('/user_fields', UserFieldsController);
+		this.app.use('/audits', AuditsController);
+		this.app.use('/sla', SlaController);
+		this.app.use('/tickets', TicketsController);
 	}
 
 	public config () {

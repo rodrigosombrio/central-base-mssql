@@ -15,12 +15,15 @@ import { OrganizationMemberships } from '../models/OrganizationMemberships';
 import { Organizations } from '../models/Organizations';
 import { Params } from '../models/Params';
 import { Sections } from '../models/Sections';
+import { SlaPolicies } from '../models/SlaPolicies';
 import { TicketEvents } from '../models/TicketEvents';
 import { TicketFields } from '../models/TicketFields';
 import { Tickets } from '../models/Tickets';
+import { TicketsAudits } from '../models/TicketsAudits';
 import { UserFields } from '../models/UserFields';
 import { Users } from '../models/Users';
 import { logger } from './index';
+import { TicketsComments } from '../models/TicketsComments';
 
 const definitions: any = config.get('db');
 const params: SqlServerConnectionOptions = {
@@ -39,12 +42,15 @@ const params: SqlServerConnectionOptions = {
 		OrganizationFields,
 		OrganizationMemberships,
 		Tickets,
+		TicketsAudits,
+		TicketsComments,
 		TicketEvents,
 		TicketFields,
 		Locales,
 		Categories,
 		Sections,
 		Articles,
+		SlaPolicies,
 	],
 	host: definitions.host,
 	logging: false,

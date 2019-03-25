@@ -6,3 +6,6 @@ export * from './organizationfields.route';
 export * from './organizationmemberships.route';
 export * from './groupmemberships.route';
 export * from './userfields.route';
+export * from './audits.route';
+export * from './sla.route';
+export * from './tickets.route';

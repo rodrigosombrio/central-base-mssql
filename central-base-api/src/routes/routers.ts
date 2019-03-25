@@ -1,12 +1,10 @@
-import { BaseEntity } from 'typeorm';
 import { IPagination } from '../interface/IPagination';
 import { Database } from '../services/database';
 import { Pagination } from '../services/pagination';
 
-const db: Database = new Database();
-
 export class BaseRouter {
 	public async json (entity: any, table: string, pagination: IPagination) {
+		const db: Database = new Database();
 		const records: any = await db
 			.repository(entity)
 			.createQueryBuilder(table)

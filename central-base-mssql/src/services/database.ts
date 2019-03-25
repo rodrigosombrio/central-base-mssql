@@ -15,6 +15,7 @@ import { OrganizationMemberships } from '../models/OrganizationMemberships';
 import { Organizations } from '../models/Organizations';
 import { Params } from '../models/Params';
 import { Sections } from '../models/Sections';
+import { SlaPolicies } from '../models/SlaPolicies';
 import { TicketEvents } from '../models/TicketEvents';
 import { TicketFields } from '../models/TicketFields';
 import { Tickets } from '../models/Tickets';
@@ -47,6 +48,7 @@ const params: SqlServerConnectionOptions = {
 		Categories,
 		Sections,
 		Articles,
+		SlaPolicies,
 	],
 	host: definitions.host,
 	logging: false,
@@ -84,4 +86,21 @@ export class Database {
 				return done(error);
 			});
 	}
+	public async saveDb (model: any, content: any, where: any) {
+		try {
+			const entity: any = state.db.manager.create(model, content);
+			const entitydb = await state.db.manager.find(model, where);
+			if (entitydb.length > 0) {
+				await state.db.manager.update(model, where, content);
+			} else {
+				await state.db.manager.save(model, entity);
+			}
+			return entity;
+		} catch (err) {
+			console.log('err', err);
+			return err;
+		}
+
+	}
+
 }
