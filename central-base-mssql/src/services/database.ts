@@ -97,10 +97,7 @@ export class Database {
 			}
 			return entity;
 		} catch (err) {
-			console.log('err', err);
 			return err;
 		}
-
 	}
-
 }

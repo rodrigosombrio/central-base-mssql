@@ -18,7 +18,6 @@ export class CustomizationTickets {
 	}
 
 	public static async comments (event: string, data: Tickets) {
-		console.log('comments')
 		const baseUri = Cache.get('baseUriZendesk');
 		let url = baseUri + '/api/v2/tickets/' + data.id + '/comments.json';
 		let next: boolean = true;
@@ -50,7 +49,6 @@ export class CustomizationTickets {
 		return true;
 	}
 	public static async audits (event: string, data: Tickets) {
-		console.log('audits')
 		const baseUri = Cache.get('baseUriZendesk');
 		let url = baseUri + '/api/v2/tickets/' + data.id + '/audits.json';
 		let next: boolean = true;
@@ -73,7 +71,6 @@ export class CustomizationTickets {
 				for (const evt of content.events) {
 					entity.events.push(JSON.stringify(evt));
 				}
-				console.log('entity.events', entity.events)
 				const entitydb = await db.manager.find(TicketsAudits, { id: '' + content.id });
 				if (entitydb.length > 0) {
 					await db.manager.update(TicketsAudits, { id: '' + content.id }, entity);
@@ -81,7 +78,6 @@ export class CustomizationTickets {
 					await db.manager.save(TicketsAudits, entity);
 				}
 			} catch (err) {
-				console.log('err', err);
 				await log('ERROR', new Configuration(), JSON.stringify(err), content.id.toString());
 			}
 		}
@@ -91,5 +87,4 @@ export class CustomizationTickets {
 	constructor () {
 		logger.info('in customization tickets');
 	}
-
 }
