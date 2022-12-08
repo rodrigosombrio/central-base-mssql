@@ -17,7 +17,7 @@
 	"author": "Rodrigo Sombrio <rodrigo.sombrio@totvs.com.br> (http://www.totvs.com)",
 	"license": "MIT",
 	"dependencies": {
-		"body-parser": "^1.18.3",
+		"body-parser": "^1.20.1",
 		"compression": "^1.7.2",
 		"config": "^1.31.0",
 		"cookie-parser": "^1.4.3",
@@ -25,7 +25,7 @@
 		"debug": "^3.1.0",
 		"del": "^3.0.0",
 		"errorhandler": "^1.5.0",
-		"express": "^4.16.3",
+		"express": "^4.18.2",
 		"express-session": "^1.15.6",
 		"express-status-monitor": "^1.2.3",
 		"helmet": "^3.12.1",
